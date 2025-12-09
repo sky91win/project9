@@ -1,0 +1,2 @@
+[deploy_server]
+44.221.68.141 ansible_user=ubuntu

@@ -1,0 +1,15 @@
+- hosts: deploy_server
+  become: yes
+  tasks:
+
+    - name: Stop old container
+      command: docker stop project9 || true
+
+    - name: Remove old container
+      command: docker rm project9 || true
+
+    - name: Pull latest docker image
+      command: docker pull sky91win/project9:latest
+
+    - name: Run new container
+      command: docker run -d --name project9 -p 80:80 sky91win/project9:latest

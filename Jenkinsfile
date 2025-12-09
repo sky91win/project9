@@ -18,17 +18,28 @@ pipeline {
             steps {
                 sh '''
                 docker build -t $DOCKERHUB_USER/$DOCKERHUB_REPO:latest .
-                docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
-                docker push $DOCKERHUB_USER/$DOCKERHUB_REPO:latest
                 '''
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DUSER',
+                    passwordVariable: 'DPASS'
+                )]) {
+                    sh '''
+                    docker login -u "$DUSER" -p "$DPASS"
+                    docker push $DOCKERHUB_USER/$DOCKERHUB_REPO:latest
+                    '''
+                }
             }
         }
 
         stage('Deploy Using Ansible') {
             steps {
-                sh '''
-                ansible-playbook -i inventory deploy.yml
-                '''
+                sh 'ansible-playbook -i inventory deploy.yml'
             }
         }
     }
